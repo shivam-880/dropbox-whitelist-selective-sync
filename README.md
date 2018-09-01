@@ -27,5 +27,18 @@ study material/xyz
 
 ## Run Docker Container
 ```
-$ docker run -d --name=dropbox --volume=path-to-your-dropbox-directory:/dbox/Dropbox codingkapoor/dropbox
+$ docker run -d --name=dropbox --restart=always --volume=path-to-your-dropbox-directory:/dbox/Dropbox codingkapoor/dropbox
 ```
+
+## Link Dropbox Account
+Check the logs of the container to get a URL to link your Dropbox account.
+
+```
+docker logs -f dropbox
+```
+
+Copy and paste similar link from container logs in a browser to register your dropbox account to the dropbox instance running inside your container.
+
+**This computer isn't linked to any Dropbox account...
+Please visit https://www.dropbox.com/cli_link_nonce?nonce=61df1d68e00bf41198699824d4d69438 to link this device.**
+
