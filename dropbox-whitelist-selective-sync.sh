@@ -41,13 +41,6 @@ rotateLog() {
 	fi
 }
 
-containsElement () {
-	local e match="$1"
-	shift
-	for e; do [[ "$e" == "$match" ]] && return 0; done
-	return 1
-}
-
 export IFS="|"
 
 _md5=`md5sum $DROPBOX_WHITELIST_FILE | cut -d" " -f 1`
@@ -100,18 +93,18 @@ while :; do
 
 	# Keep only parent directories in the diff2. This gives us the Blacklist.
 	bl=()
-	if [ ${#diff2[@]} -ne 0 ]; then
-		for i in "${diff2[@]}"; do 
-			if [ "$i" != "${i%/*}" ]; then
-				containsElement "${i%/*}" "${diff2[@]}"
-				if [ $? -ne 0 ]; then
-					bl+=("$i")
-				fi
-			else
-				bl+=("$i")
-			fi
+	for i in "${diff2[@]}"; do
+		flag=0
+		for j in "${bl[@]}"; do
+		    if [[ "$i" == "$j"* ]]; then
+		        flag=1
+		        break
+		    fi
 		done
-	fi
+		if [ $flag == 0 ]; then
+		    bl+=("$i")
+		fi
+	done
 
 	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the blacklisted files and directories under $DROPBOX_SYNC_DIR: ${bl[*]}"
 
