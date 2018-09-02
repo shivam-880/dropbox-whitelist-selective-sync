@@ -18,7 +18,7 @@ while sleep 60; do
   PID1=`pidof dropbox`
   PID2=`echo $(pgrep -f dropbox-whitelist-selective-sync.sh) | cut -d' ' -f1`
 
-  if [ -z $PID1 -o -z $PID2 ]; then
+  if [ -z "$PID1" -o -z "$PID2" ]; then
     echo "One of the processes has already exited."
     exit 1
   fi
