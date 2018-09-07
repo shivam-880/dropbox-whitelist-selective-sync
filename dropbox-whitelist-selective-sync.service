@@ -1,0 +1,7 @@
+[Unit]
+Description=Whitelisting Based Selective Sync In Dropbox
+[Service]
+Type=simple
+User=shivam
+Group=shivam
+ExecStart=/bin/bash /home/shivam/dropbox-whitelist/dropbox-whitelist-selective-sync.sh "/home/shivam/Dropbox"

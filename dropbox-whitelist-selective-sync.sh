@@ -1,17 +1,22 @@
 #!/bin/bash
 
-LOGFILE="/var/log/dropbox-whitelist.log"
+DROPBOX_SYNC_DIR="$1"
+DROPBOX_WHITELIST_HOME="$HOME/dropbox-whitelist"
+
+DROPBOX_WHITELIST="$DROPBOX_WHITELIST_HOME/.dropbox-whitelist"
+
+DROPBOX_WHITELIST_LOGPATH="$DROPBOX_WHITELIST_HOME/log"
+mkdir -p $DROPBOX_WHITELIST_LOGPATH
+
+DROPBOX_WHITELIST_LOGFILE="$DROPBOX_WHITELIST_LOGPATH/dropbox-whitelist.log"
 
 function sighuphandler() {
-	exec > >(tee "$LOGFILE") 2>&1
+	exec > >(tee "$DROPBOX_WHITELIST_LOGFILE") 2>&1
 }
 
 trap sighuphandler SIGHUP
 
 sighuphandler
-
-DROPBOX_SYNC_DIR="$1"
-DROPBOX_WHITELIST_FILE="$DROPBOX_SYNC_DIR/.dropbox-whitelist"
 
 if [ -z "$DROPBOX_SYNC_DIR" ]; then
 	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [ERROR] - No arguments specified! Please provide a correct dropbox sync directory as an argument to this script."
@@ -23,27 +28,26 @@ if [ ! -d $DROPBOX_SYNC_DIR ]; then
 	exit 1
 fi
 
-if [ ! -f $DROPBOX_WHITELIST_FILE ]; then
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [ERROR] - File $DROPBOX_WHITELIST_FILE not found!"
+if [ ! -f $DROPBOX_WHITELIST ]; then
+	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [ERROR] - File $DROPBOX_WHITELIST not found!"
 	exit 1
 fi
 
-LOGPATH="/var/log"
 MAX_LOGFILE_SIZE=100
 rotateLog() {
-	find $LOGPATH -type f -wholename "$LOGFILE.*" -mtime +15 -exec rm {} \;
+	find $DROPBOX_WHITELIST_LOGPATH -type f -wholename "$DROPBOX_WHITELIST_LOGFILE.*" -mtime +15 -exec rm {} \;
 
-	currentsize=$(du -m $LOGFILE | cut -f1)
+	currentsize=$(du -m $DROPBOX_WHITELIST_LOGFILE | cut -f1)
 	if [ $currentsize -ge $MAX_LOGFILE_SIZE ]; then
 		echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Rotating logs in the background."
-		savelog -dn $LOGFILE &>/dev/null
+		savelog -dn $DROPBOX_WHITELIST_LOGFILE &>/dev/null
 		kill -s SIGHUP $$
 	fi
 }
 
 export IFS="|"
 
-_md5=`md5sum $DROPBOX_WHITELIST_FILE | cut -d" " -f 1`
+_md5=`md5sum $DROPBOX_WHITELIST | cut -d" " -f 1`
 
 while :; do
 
@@ -57,7 +61,7 @@ while :; do
 	wl=()
 	while IFS= read -r i; do
 		wl+=("$i")
-	done < $DROPBOX_WHITELIST_FILE
+	done < $DROPBOX_WHITELIST
 
 	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the whitelisted files and directories under $DROPBOX_SYNC_DIR: ${wl[*]}"
 
@@ -110,9 +114,9 @@ while :; do
 
 	# Reset dropbox exclusion list everytime .dropbox-whitelist is updated. 
 	# Since sync after reset may take some time for files of bigger sizes, it may take a couple of iterations before they get included or excluded as part of dropbox exclusion list. This is one particular reason why file and directory names can't be validated locally per iteration.
-	md5=`md5sum $DROPBOX_WHITELIST_FILE | cut -d" " -f 1`
+	md5=`md5sum $DROPBOX_WHITELIST | cut -d" " -f 1`
 	if [ "$md5" != "$_md5" ]; then
-		echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Resetting dropbox exclusion list since $DROPBOX_WHITELIST_FILE is modified! New md5 $md5 vs old md5 $_md5."
+		echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Resetting dropbox exclusion list since $DROPBOX_WHITELIST is modified! New md5 $md5 vs old md5 $_md5."
 
 		_md5=$md5
 		dropbox exclude remove $DROPBOX_SYNC_DIR
