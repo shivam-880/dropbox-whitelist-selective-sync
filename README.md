@@ -1,7 +1,5 @@
 # dropbox-whitelist-selective-sync
-Whitelisting based selective sync for Dropbox
-
-This are basically two ways to setup whitelisting based selective sync in dropbox on your host machine:
+Whitelisting based selective sync for Dropbox. This are basically two ways to setup whitelisting based selective sync in dropbox on your host machine:
 
 ## Daemon Service
 If you already have a dropbox instance running on your machine, you can run whitelisting scheme as a daemon service. However, if for any reason whitelisting exits, dropbox would continue to download all the non-whitelisted data.
