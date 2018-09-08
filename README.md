@@ -4,7 +4,46 @@ Whitelisting based selective sync for Dropbox
 This are basically two ways to setup whitelisting based selective sync in dropbox on your host machine:
 
 ## Daemon Service
-If you already 
+If you already have a dropbox instance running on your machine, you can run whitelisting scheme as a daemon service. However, if for any reason whitelisting exits, dropbox would continue to download all the non-whitelisted data.
+
+**Download This Repository**
+
+```
+git clone https://github.com/codingkapoor/dropbox-whitelist-selective-sync.git
+cd dropbox-whitelist-selective-sync
+```
+
+**Create Whitelist**
+
+```
+mkdir -p $HOME/dropbox-whitelist
+cat > $HOME/dropbox-whitelist
+```
+
+**Copy Whitelisting Script**
+
+```
+cp ./dropbox-whitelist-selective-sync.sh $HOME/dropbox-whitelist
+```
+
+**Copy systemd Unit File**
+
+```
+cp ./dropbox-whitelist-selective-sync.service /etc/systemd/system
+```
+
+**Run As Daemon**
+
+```
+systemctl start dropbox-whitelist-selective-sync.service
+```
+
+**To Follow Logs**
+
+```
+journald -f -u dropbox-whitelist-selective-sync -e
+tail -f $HOME/dropbox-whitelist/log/dropbox-whitelist.log
+```
 
 ## Docker Container
 Setting up as a docker container would mean setting up both the dropbox and whitelisting together. This is a preferred appraoch since if whitelisting exits for any reason, so would container resulting in dropbox sync coming to a halt too i.e., none of the non-whitelisted data would be downloaded from the dropbox server saving both space and bandwidth.
