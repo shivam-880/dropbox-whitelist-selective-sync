@@ -28,6 +28,19 @@ cp ./dropbox-whitelist-selective-sync.sh $HOME/dropbox-whitelist
 
 **Copy systemd Unit File**
 
+But before you could copy this systemd unit file to its destination location, you would need to certain changes to it relevant to your host machine. Whitelisting script should only be executed with the same user the dropbox daemon instance is running as because otherwise it won't be able to invoke dropbox APIs and you may stumble upon *Dropbox isn't running!* issue. You can run the whitelisting daemon with the same user as dropbox instance by updating the systemd unit file with appropriate user and group values.
+
+```
+User=<same-user-dropbox-daemon-was-ran-with>
+Group=<same-user-dropbox-daemon-was-ran-with>
+```
+
+Also, you would need to provide dropbox sync location on your machine. If it contains spaces, quote the string.
+```
+ExecStart=/bin/bash /home/shivam/dropbox-whitelist/dropbox-whitelist-selective-sync.sh <dropbox-sync-location>
+```
+
+Now you can copy the file.
 ```
 cp ./dropbox-whitelist-selective-sync.service /etc/systemd/system
 ```
