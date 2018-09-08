@@ -3,10 +3,10 @@ Whitelisting based selective sync for Dropbox
 
 This are basically two ways to setup whitelisting based selective sync in dropbox on your host machine:
 
-## 1. As A Daemon Service
+## Daemon Service
 If you already 
 
-## 2. As A Docker Container
+## Docker Container
 Setting up as a docker container would mean setting up both the dropbox and whitelisting together. This is a preferred appraoch since if whitelisting exits for any reason, so would container resulting in dropbox sync coming to a halt too i.e., none of the non-whitelisted data would be downloaded from the dropbox server saving both space and bandwidth.
 
 **Build Docker Image**
