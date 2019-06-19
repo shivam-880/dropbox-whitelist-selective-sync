@@ -52,9 +52,11 @@ _md5=`md5sum $DROPBOX_WHITELIST | cut -d" " -f 1`
 while :; do
 
 	# List of all the files and directories under $DROPBOX_SYNC_DIR.
+
 	read -ra dl <<< "`find $DROPBOX_SYNC_DIR \( ! -regex '.*/\..*' \) | awk '{if(NR>1)print}' | cut -c $(expr $(echo $DROPBOX_SYNC_DIR | wc -c) + 1)- | paste -d\| -s`"
 
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the files and directories under $DROPBOX_SYNC_DIR: ${dl[*]}"
+        # echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the files and directories under $DROPBOX_SYNC_DIR: ${dl[*]}"
+
 
 	# List of all the whitelisted files and directories under $DROPBOX_SYNC_DIR.
 	# Validation of file and directory names can't be performed for whitelisting based selective sync approach. Hence it is assumed that the file and directoriy names mentioned in whitelist are indeed correct. Incorrect file and directory names may result in undesirable results.
@@ -63,7 +65,7 @@ while :; do
 		wl+=("$i")
 	done < $DROPBOX_WHITELIST
 
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the whitelisted files and directories under $DROPBOX_SYNC_DIR: ${wl[*]}"
+	# echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the whitelisted files and directories under $DROPBOX_SYNC_DIR: ${wl[*]}"
 
 	# List of elements from Directorylist that don't start with any element from Whitelist.
 	diff1=()
@@ -110,7 +112,7 @@ while :; do
 		fi
 	done
 
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the blacklisted files and directories under $DROPBOX_SYNC_DIR: ${bl[*]}"
+	# echo "[`date "+%Y-%m-%d %H:%M:%S"`] [DEBUG] - List of all the blacklisted files and directories under $DROPBOX_SYNC_DIR: ${bl[*]}"
 
 	# Reset dropbox exclusion list everytime .dropbox-whitelist is updated. 
 	# Since sync after reset may take some time for files of bigger sizes, it may take a couple of iterations before they get included or excluded as part of dropbox exclusion list. This is one particular reason why file and directory names can't be validated locally per iteration.
@@ -122,11 +124,11 @@ while :; do
 		dropbox exclude remove $DROPBOX_SYNC_DIR
 	fi
 
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Updating dropbox exclusion list."
+	# echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Updating dropbox exclusion list."
 	for i in "${bl[@]}"; do dropbox exclude add "$DROPBOX_SYNC_DIR/$i"; done
 	
 	rotateLog &	
 
-	echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Sleep for 10 sec..."
+	# echo "[`date "+%Y-%m-%d %H:%M:%S"`] [INFO] - Sleep for 10 sec..."
 	sleep 10
 done
